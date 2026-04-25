@@ -9,5 +9,20 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 
+// -------------------------------------------------------
 // Public routes (no token needed)
+// -------------------------------------------------------
+
 Route::post('/register', [AuthController::class, 'register']);
+
+Route::post('/login', [AuthController::class, 'login']);
+
+
+
+// -------------------------------------------------------
+// Protected Routes (token required)
+// -------------------------------------------------------
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout']);
+});
