@@ -7,6 +7,7 @@ use App\Http\Controllers\API\FlightController;
 use App\Http\Controllers\API\BookingController;
 use App\Http\Controllers\API\PassengerController;
 use App\Http\Controllers\API\SavedFlightController;
+use App\Http\Controllers\API\ProfileController;
 
 
 
@@ -57,5 +58,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/saved-flights',                [SavedFlightController::class, 'index']);
     Route::post('/flights/{id}/save',           [SavedFlightController::class, 'save']);
     Route::delete('/flights/{id}/unsave',       [SavedFlightController::class, 'unsave']);
+
+    // Profile
+    Route::get('/profile', [ProfileController::class, 'show']);
+    Route::put('/profile', [ProfileController::class, 'update']);
 
 });
