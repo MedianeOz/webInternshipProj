@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\FlightController;
 use App\Http\Controllers\API\BookingController;
+use App\Http\Controllers\API\PassengerController;
 
 
 
@@ -45,5 +46,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/bookings',             [BookingController::class, 'store']);
     Route::get('/bookings/{id}',         [BookingController::class, 'show']);
     Route::patch('/bookings/{id}/cancel', [BookingController::class, 'cancel']);
+
+    // Passengers
+    Route::get('/bookings/{id}/passengers',              [PassengerController::class, 'index']);
+    Route::post('/bookings/{id}/passengers',             [PassengerController::class, 'store']);
+    Route::delete('/bookings/{id}/passengers/{pid}',     [PassengerController::class, 'destroy']);
 
 });
