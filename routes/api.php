@@ -6,6 +6,7 @@ use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\FlightController;
 use App\Http\Controllers\API\BookingController;
 use App\Http\Controllers\API\PassengerController;
+use App\Http\Controllers\API\SavedFlightController;
 
 
 
@@ -51,5 +52,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/bookings/{id}/passengers',              [PassengerController::class, 'index']);
     Route::post('/bookings/{id}/passengers',             [PassengerController::class, 'store']);
     Route::delete('/bookings/{id}/passengers/{pid}',     [PassengerController::class, 'destroy']);
+
+    // Saved flights
+    Route::get('/saved-flights',                [SavedFlightController::class, 'index']);
+    Route::post('/flights/{id}/save',           [SavedFlightController::class, 'save']);
+    Route::delete('/flights/{id}/unsave',       [SavedFlightController::class, 'unsave']);
 
 });
