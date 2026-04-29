@@ -4,6 +4,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\FlightController;
+use App\Http\Controllers\API\BookingController;
+
 
 
 Route::get('/user', function (Request $request) {
@@ -37,5 +39,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/admin/flights',        [FlightController::class, 'store']);
     Route::put('/admin/flights/{id}',    [FlightController::class, 'update']);
     Route::delete('/admin/flights/{id}', [FlightController::class, 'destroy']);
+
+    // Bookings
+    Route::get('/bookings',              [BookingController::class, 'index']);
+    Route::post('/bookings',             [BookingController::class, 'store']);
+    Route::get('/bookings/{id}',         [BookingController::class, 'show']);
+    Route::patch('/bookings/{id}/cancel', [BookingController::class, 'cancel']);
 
 });
