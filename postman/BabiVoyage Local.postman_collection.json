@@ -209,7 +209,7 @@
         {
           "name": "getProfile",
           "request": {
-            "method": "POST",
+            "method": "GET",
             "header": [
               {
                 "key": "Accept",
@@ -418,7 +418,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"flight_number\": \"EF307\",\r\n  \"airline_id\": 2,\r\n  \"origin_airport_id\": 2,\r\n  \"destination_airport_id\": 1,\r\n  \"departure_time\": \"2026-05-04 08:00:00\",\r\n  \"arrival_time\": \"2026-05-04 10:30:00\",\r\n  \"price\": 145.00,\r\n  \"total_seats\": 100,\r\n  \"available_seats\": 85,\r\n  \"status\": \"scheduled\"\r\n}\r\n",
+              "raw": "{\n  \"flight_number\": \"EF307\",\n  \"airline_id\": 2,\n  \"origin_airport_id\": 2,\n  \"destination_airport_id\": 1,\n  \"departure_time\": \"2026-07-04 08:00:00\",\n  \"arrival_time\": \"2026-07-04 10:30:00\",\n  \"price\": 145.0,\n  \"total_seats\": 100,\n  \"available_seats\": 85,\n  \"status\": \"scheduled\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -461,7 +461,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"price\": 135.00,\r\n  \"available_seats\": 110\r\n}",
+              "raw": "{\n  \"price\": 135.0,\n  \"available_seats\": 80\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -521,6 +521,40 @@
                 "admin",
                 "flights",
                 "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "allBookingsAdmin",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/bookings",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "bookings"
               ]
             }
           },
@@ -822,6 +856,133 @@
                 "{id}",
                 "passengers",
                 "{pid}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{token}}",
+            "type": "string"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Saved Flights",
+      "item": [
+        {
+          "name": "listSavedFlights",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/saved-flights",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "saved-flights"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "saveFlight",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/flights/1/save",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "flights",
+                "1",
+                "save"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "unsaveFlight",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/flights/1/unsave",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "flights",
+                "1",
+                "unsave"
               ]
             }
           },

@@ -20,8 +20,10 @@ Route::get('/user', function (Request $request) {
 // Public routes (no token needed)
 // -------------------------------------------------------
 
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
+Route::middleware('throttle:10,1')->group(function () {
+    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/login', [AuthController::class, 'login']);
+});
 
 
 // Public flight browsing (anyone can browse)
@@ -42,6 +44,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/admin/flights',        [FlightController::class, 'store']);
     Route::put('/admin/flights/{id}',    [FlightController::class, 'update']);
     Route::delete('/admin/flights/{id}', [FlightController::class, 'destroy']);
+    Route::get('/admin/bookings',        [BookingController::class, 'adminIndex']);
 
     // Bookings
     Route::get('/bookings',              [BookingController::class, 'index']);

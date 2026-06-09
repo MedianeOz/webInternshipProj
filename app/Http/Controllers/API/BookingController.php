@@ -11,6 +11,41 @@ use Illuminate\Support\Str;
 class BookingController extends Controller
 {
     // -----------------------------------------------
+    // GET /api/admin/bookings
+    // Admin: List all bookings in the system
+    // -----------------------------------------------
+    public function adminIndex()
+    {
+        if (auth()->user()?->role !== 'admin') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Only admins can view all bookings.',
+            ], 403);
+        }
+
+        $bookings = Booking::with(['user', 'flight.airline', 'flight.originAirport', 'flight.destinationAirport', 'passengers'])
+            ->latest()
+            ->paginate(15);
+
+        return response()->json([
+            'success' => true,
+            'data' => $bookings->items(),
+            'meta' => [
+                'current_page' => $bookings->currentPage(),
+                'per_page' => $bookings->perPage(),
+                'total' => $bookings->total(),
+                'last_page' => $bookings->lastPage(),
+            ],
+            'links' => [
+                'first' => $bookings->url(1),
+                'last' => $bookings->url($bookings->lastPage()),
+                'prev' => $bookings->previousPageUrl(),
+                'next' => $bookings->nextPageUrl(),
+            ],
+        ], 200);
+    }
+
+    // -----------------------------------------------
     // GET /api/bookings
     // List all bookings for the authenticated user
     // -----------------------------------------------

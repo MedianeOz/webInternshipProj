@@ -7,6 +7,7 @@ use App\Http\Requests\Flight\StoreFlightRequest;
 use App\Http\Requests\Flight\UpdateFlightRequest;
 use App\Models\Flight;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class FlightController extends Controller
 {
@@ -15,16 +16,15 @@ class FlightController extends Controller
     // PUBLIC: GET /api/flights
     // List all available (scheduled) flights
     // -----------------------------------------------
-    public function index()
+    public function index(Request $request)
     {
+        $perPage = $this->perPage($request);
+
         $flights = Flight::with(['airline', 'originAirport', 'destinationAirport'])
             ->where('status', 'scheduled')
-            ->get();
+            ->paginate($perPage);
 
-        return response()->json([
-            'success' => true,
-            'data'    => $flights,
-        ], 200);
+        return $this->paginatedResponse($flights);
     }
 
 
@@ -76,12 +76,9 @@ class FlightController extends Controller
             $query->where('price', '<=', $request->max_price);
         }
 
-        $flights = $query->get();
+        $flights = $query->paginate($this->perPage($request))->withQueryString();
 
-        return response()->json([
-            'success' => true,
-            'data'    => $flights,
-        ], 200);
+        return $this->paginatedResponse($flights);
     }
 
 
@@ -158,6 +155,13 @@ class FlightController extends Controller
     // -----------------------------------------------
     public function destroy($id)
     {
+        if (auth()->user()?->role !== 'admin') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Only admins can delete flights.',
+            ], 403);
+        }
+
         $flight = Flight::find($id);
 
         if (!$flight) {
@@ -172,6 +176,31 @@ class FlightController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Flight deleted successfully.',
+        ], 200);
+    }
+
+    private function perPage(Request $request): int
+    {
+        return max(1, min((int) $request->integer('per_page', 15), 50));
+    }
+
+    private function paginatedResponse(LengthAwarePaginator $paginator)
+    {
+        return response()->json([
+            'success' => true,
+            'data' => $paginator->items(),
+            'meta' => [
+                'current_page' => $paginator->currentPage(),
+                'per_page' => $paginator->perPage(),
+                'total' => $paginator->total(),
+                'last_page' => $paginator->lastPage(),
+            ],
+            'links' => [
+                'first' => $paginator->url(1),
+                'last' => $paginator->url($paginator->lastPage()),
+                'prev' => $paginator->previousPageUrl(),
+                'next' => $paginator->nextPageUrl(),
+            ],
         ], 200);
     }
 
