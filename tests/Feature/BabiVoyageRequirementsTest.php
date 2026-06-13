@@ -2,12 +2,16 @@
 
 namespace Tests\Feature;
 
+use App\Filament\Resources\BookingResource\Pages\CreateBooking;
+use App\Filament\Resources\BookingResource\Pages\EditBooking;
 use App\Models\Airline;
 use App\Models\Airport;
+use App\Models\Booking;
 use App\Models\Flight;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
+use Livewire\Livewire;
 use Tests\TestCase;
 
 class BabiVoyageRequirementsTest extends TestCase
@@ -208,6 +212,77 @@ class BabiVoyageRequirementsTest extends TestCase
             ->assertOk()
             ->assertJsonPath('success', true)
             ->assertJsonPath('meta.total', 1);
+    }
+
+    public function test_admin_can_create_booking_from_filament(): void
+    {
+        $admin = $this->createUser('admin');
+        $customer = $this->createUser('user');
+        $flight = $this->createFlight([
+            'price' => 200.00,
+            'available_seats' => 5,
+        ]);
+
+        $this->actingAs($admin);
+
+        Livewire::test(CreateBooking::class)
+            ->fillForm([
+                'user_id' => $customer->id,
+                'flight_id' => $flight->id,
+                'seat_count' => 2,
+                'status' => 'confirmed',
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $booking = Booking::firstOrFail();
+
+        $this->assertSame($customer->id, $booking->user_id);
+        $this->assertSame($flight->id, $booking->flight_id);
+        $this->assertSame(2, $booking->seat_count);
+        $this->assertSame('400.00', $booking->total_price);
+        $this->assertSame('confirmed', $booking->status);
+        $this->assertDatabaseHas('flights', [
+            'id' => $flight->id,
+            'available_seats' => 3,
+        ]);
+    }
+
+    public function test_admin_can_create_pending_booking_then_edit_it_to_confirmed(): void
+    {
+        $admin = $this->createUser('admin');
+        $customer = $this->createUser('user');
+        $flight = $this->createFlight([
+            'price' => 150.00,
+            'available_seats' => 4,
+        ]);
+
+        $this->actingAs($admin);
+
+        Livewire::test(CreateBooking::class)
+            ->fillForm([
+                'user_id' => $customer->id,
+                'flight_id' => $flight->id,
+                'seat_count' => 1,
+                'status' => 'pending',
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $booking = Booking::firstOrFail();
+
+        $this->assertSame('pending', $booking->status);
+
+        Livewire::test(EditBooking::class, [
+            'record' => $booking->getRouteKey(),
+        ])
+            ->fillForm([
+                'status' => 'confirmed',
+            ])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $this->assertSame('confirmed', $booking->refresh()->status);
     }
 
     private function createUser(string $role): User
